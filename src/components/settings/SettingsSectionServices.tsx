@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useBrand } from '@/contexts/brand-context';
 
 type ServiceItem = { type: string; description: string };
@@ -17,6 +17,9 @@ export function SettingsSectionServices({ onSaved }: SettingsSectionServicesProp
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [scrollToIndex, setScrollToIndex] = useState<number | null>(null);
+  const serviceRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     setServiceThatIsBeingPromoted(String(config.serviceThatIsBeingPromoted ?? ''));
@@ -29,12 +32,23 @@ export function SettingsSectionServices({ onSaved }: SettingsSectionServicesProp
     })) : []);
   }, [brand?.brandId, brand?.config]);
 
-  const addService = () => {
+  useEffect(() => {
+    if (scrollToIndex === null) return;
+    const el = serviceRefs.current[scrollToIndex];
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    setScrollToIndex(null);
+  }, [scrollToIndex, services.length]);
+
+  const addService = useCallback(() => {
     setServices((prev) => [...prev, { type: '', description: '' }]);
-  };
+    setScrollToIndex(services.length);
+  }, [services.length]);
 
   const removeService = (index: number) => {
     setServices((prev) => prev.filter((_, i) => i !== index));
+    setExpandedIndex((prev) => (prev === index ? null : prev != null && prev > index ? prev - 1 : prev));
   };
 
   const updateService = (index: number, field: keyof ServiceItem, value: string) => {
@@ -67,27 +81,41 @@ export function SettingsSectionServices({ onSaved }: SettingsSectionServicesProp
     <>
       <form onSubmit={handleSave}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div className="field">
-            <label htmlFor="serviceThatIsBeingPromoted">Currently promoted service</label>
-            <input
-              id="serviceThatIsBeingPromoted"
-              type="text"
-              className="input"
-              value={serviceThatIsBeingPromoted}
-              onChange={(e) => setServiceThatIsBeingPromoted(e.target.value)}
-              placeholder="e.g. Happy Hours"
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="focusCalibration">Focus calibration</label>
-            <input
-              id="focusCalibration"
-              type="number"
-              className="input"
-              value={focusCalibration}
-              onChange={(e) => setFocusCalibration(e.target.value)}
-              placeholder="Optional number"
-            />
+          <div className="field-group">
+            <div className="field">
+              <label htmlFor="serviceThatIsBeingPromoted">Currently promoted service</label>
+              <select
+                id="serviceThatIsBeingPromoted"
+                className="input select"
+                value={serviceThatIsBeingPromoted}
+                onChange={(e) => setServiceThatIsBeingPromoted(e.target.value)}
+                aria-label="Currently promoted service"
+              >
+                <option value="">None</option>
+                {services
+                  .map((s) => s.type.trim())
+                  .filter(Boolean)
+                  .filter((type, i, arr) => arr.indexOf(type) === i)
+                  .map((type) => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                {serviceThatIsBeingPromoted.trim() &&
+                  !services.some((s) => s.type.trim() === serviceThatIsBeingPromoted.trim()) && (
+                  <option value={serviceThatIsBeingPromoted}>{serviceThatIsBeingPromoted}</option>
+                )}
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="focusCalibration">Focus calibration</label>
+              <input
+                id="focusCalibration"
+                type="number"
+                className="input input-narrow"
+                value={focusCalibration}
+                onChange={(e) => setFocusCalibration(e.target.value)}
+                placeholder="Optional number"
+              />
+            </div>
           </div>
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
@@ -100,56 +128,75 @@ export function SettingsSectionServices({ onSaved }: SettingsSectionServicesProp
               <p className="text-muted" style={{ fontSize: 13 }}>No services yet. Add one to describe what your brand offers.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {services.map((service, index) => (
-                  <div
-                    key={index}
-                    className="card-elevated"
-                    style={{ padding: 16, border: '1px solid var(--border)', borderRadius: 8 }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                      <span style={{ fontWeight: 600, fontSize: 14 }}>Service {index + 1}</span>
+                {services.map((service, index) => {
+                  const isExpanded = expandedIndex === index;
+                  const displayName = service.type.trim() || `Service ${index + 1}`;
+                  return (
+                    <div
+                      key={index}
+                      ref={(el) => { serviceRefs.current[index] = el; }}
+                      className="card-elevated service-card"
+                      style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}
+                    >
                       <button
                         type="button"
-                        className="btn btn-ghost"
-                        onClick={() => removeService(index)}
-                        style={{ fontSize: 12, padding: '4px 8px' }}
-                        aria-label="Remove service"
+                        className="service-card-header"
+                        onClick={() => setExpandedIndex((prev) => (prev === index ? null : index))}
+                        aria-expanded={isExpanded}
                       >
-                        Remove
+                        <span className="service-card-title">{displayName}</span>
+                        <span className="service-card-chevron" aria-hidden>
+                          {isExpanded ? '▼' : '▶'}
+                        </span>
                       </button>
+                      {isExpanded && (
+                        <div style={{ padding: 16, paddingTop: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          <div className="field">
+                            <label style={{ fontSize: 12 }}>Service type</label>
+                            <input
+                              className="input"
+                              value={service.type}
+                              onChange={(e) => updateService(index, 'type', e.target.value)}
+                              placeholder="e.g. Happy Hours"
+                            />
+                          </div>
+                          <div className="field">
+                            <label style={{ fontSize: 12 }}>Description</label>
+                            <textarea
+                              className="input"
+                              value={service.description}
+                              onChange={(e) => updateService(index, 'description', e.target.value)}
+                              placeholder="Short description of this service..."
+                              rows={3}
+                              style={{ resize: 'vertical', minHeight: 60 }}
+                            />
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <button
+                              type="button"
+                              className="btn btn-ghost"
+                              onClick={() => removeService(index)}
+                              style={{ fontSize: 12, padding: '4px 8px' }}
+                              aria-label="Remove service"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      <div className="field">
-                        <label style={{ fontSize: 12 }}>Service type</label>
-                        <input
-                          className="input"
-                          value={service.type}
-                          onChange={(e) => updateService(index, 'type', e.target.value)}
-                          placeholder="e.g. Happy Hours"
-                        />
-                      </div>
-                      <div className="field">
-                        <label style={{ fontSize: 12 }}>Description</label>
-                        <textarea
-                          className="input"
-                          value={service.description}
-                          onChange={(e) => updateService(index, 'description', e.target.value)}
-                          placeholder="Short description of this service..."
-                          rows={3}
-                          style={{ resize: 'vertical', minHeight: 60 }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
         {error && <div className="alert-error" style={{ marginTop: 16 }}>{error}</div>}
-        <button type="submit" className="btn btn-primary" disabled={busy} style={{ marginTop: 24 }}>
-          {busy ? 'Saving…' : 'Save'}
-        </button>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={busy}>
+            {busy ? 'Saving…' : 'Save'}
+          </button>
+        </div>
       </form>
     </>
   );

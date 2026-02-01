@@ -70,9 +70,11 @@ export function SettingsSectionVoice({ onSaved }: SettingsSectionVoiceProps) {
           </div>
         </div>
         {error && <div className="alert-error" style={{ marginTop: 16 }}>{error}</div>}
-        <button type="submit" className="btn btn-primary" disabled={busy} style={{ marginTop: 24 }}>
-          {busy ? 'Saving…' : 'Save'}
-        </button>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={busy}>
+            {busy ? 'Saving…' : 'Save'}
+          </button>
+        </div>
       </form>
     </>
   );

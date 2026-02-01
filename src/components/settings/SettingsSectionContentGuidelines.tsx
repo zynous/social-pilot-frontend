@@ -64,14 +64,16 @@ export function SettingsSectionContentGuidelines({ onSaved }: SettingsSectionCon
             <textarea id="caption" className="textarea" value={captionGuidelines} onChange={(e) => setCaptionGuidelines(e.target.value)} rows={3} placeholder="How we should write captions..." />
           </div>
           <div className="field">
-            <label htmlFor="audience">Target audience</label>
+            <label htmlFor="audience">Target audience (comma separated)</label>
             <textarea id="audience" className="textarea" value={targetAudience} onChange={(e) => setTargetAudience(e.target.value)} rows={2} placeholder="Who you're targeting: demographics, interests..." />
           </div>
         </div>
         {error && <div className="alert-error" style={{ marginTop: 16 }}>{error}</div>}
-        <button type="submit" className="btn btn-primary" disabled={busy} style={{ marginTop: 24 }}>
-          {busy ? 'Saving…' : 'Save'}
-        </button>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={busy}>
+            {busy ? 'Saving…' : 'Save'}
+          </button>
+        </div>
       </form>
     </>
   );

@@ -28,21 +28,20 @@ export default function LoginPage() {
 
   return (
     <div
+      className="login-page"
       style={{
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'center',
         justifyContent: 'center',
-        padding: 24,
         background: 'var(--white-smoke)',
       }}
     >
       <div style={{ width: '100%', maxWidth: 400 }}>
-        <div className="card-elevated" style={{ padding: 32 }}>
+        <div className="card-elevated login-card">
           <div style={{ marginBottom: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <img src="/images/logos/logo.png" alt="Zynous" style={{ height: 36, width: 'auto', display: 'block' }} />
-              <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0, lineHeight: 1.2 }}>
+              <span className="login-brand-text" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 0, lineHeight: 1.2 }}>
                 <span style={{ fontWeight: 700, fontSize: 20, color: 'var(--oxford-blue)', letterSpacing: '-0.02em' }}>Social Pilot</span>
                 <span className="text-muted" style={{ fontSize: 12 }}>from Zynous</span>
               </span>
@@ -85,7 +84,7 @@ export default function LoginPage() {
               type="submit"
               className="btn btn-primary"
               disabled={busy || !email.trim() || !password}
-              style={{ width: '100%', padding: 12 }}
+              style={{ width: '100%', padding: '12px 16px', minHeight: 48 }}
             >
               {busy ? 'Signing in…' : 'Sign in'}
             </button>
