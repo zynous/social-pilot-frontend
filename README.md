@@ -5,13 +5,23 @@ Brand-focused UI for managing brand configuration. Uses the same backend API as 
 ## Setup
 
 1. `pnpm install`
-2. Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_API_BASE_URL` if the API is on another origin (optional; defaults to same origin).
+2. Copy `.env.example` to `.env.local` and set `SOCIAL_PILOT_API_BASE_URL` if the API is on another origin (optional; defaults to same origin).
 3. Backend must expose `POST /api/v1/auth/login` (email + password) and return a JWT with `user.brandId`. Until `validateLogin` is implemented in the backend, login will fail with "Invalid email or password".
 
 ## Run
 
 - `pnpm dev` – dev server on port 3001
 - `pnpm build` && `pnpm start` – production
+
+## Production (GitHub Actions → S3)
+
+`SOCIAL_PILOT_API_BASE_URL` is baked in at build time. Set it in the repo so the workflow has it:
+
+1. GitHub → repo **Settings** → **Secrets and variables** → **Actions**
+2. **Variables** tab → **New repository variable**
+3. Name: `SOCIAL_PILOT_API_BASE_URL`, Value: your production API base URL (e.g. `https://api.socialpilot.com`)
+
+The workflow passes this into the build step; if unset, the app falls back to the origin the user is on (or the URL they enter at sign-in).
 
 ## Structure (extensible)
 
