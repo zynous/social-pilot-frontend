@@ -18,7 +18,7 @@ const SECTIONS = [
   { id: 'visual', label: 'Colors & logo', description: 'Visual identity', href: '?section=visual' },
   { id: 'notifications', label: 'Notifications', description: 'Notification preferences', href: '?section=notifications' },
   { id: 'content-guidelines', label: 'Content guidelines', description: 'Content and audience', href: '?section=content-guidelines' },
-  { id: 'services', label: 'Services', description: 'Promoted service and service list', href: '?section=services' },
+  { id: 'services', label: 'Services', description: 'Services you offer and promotion focus', href: '?section=services' },
   { id: 'image-video', label: 'Image & video', description: 'Media and formats', href: '?section=image-video' },
 ] as const;
 
