@@ -72,9 +72,6 @@ export default function SignInPage() {
                 <span className="text-muted" style={{ fontSize: 12 }}>from Zynous</span>
               </span>
             </div>
-            <p className="text-muted" style={{ margin: 0, fontSize: 14 }}>
-              Brand configuration
-            </p>
           </div>
 
           {mode === 'email' ? (
