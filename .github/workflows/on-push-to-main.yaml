@@ -52,13 +52,10 @@ jobs:
       - name: Invalidate CloudFront cache
         if: github.ref == 'refs/heads/main'
         run: |
-          # Get distribution ID for socialpilot.zynous.com
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[?contains(@, 'zynous.com')]].Id" --output text)
-
-          # If distribution exists, invalidate cache
-          if [ ! -z "$DISTRIBUTION_ID" ]; then
-            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?contains(join(' ', Aliases.Items || ['']), 'socialpilot.zynous.com')].Id | [0]" --output text | tr -d '\n\r' | xargs)
+          if [ -n "$DISTRIBUTION_ID" ] && [ "$DISTRIBUTION_ID" != "None" ]; then
+            aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
             echo "CloudFront cache invalidation created for distribution $DISTRIBUTION_ID"
           else
-            echo "No CloudFront distribution found for socialpilot.zynous.com"
+            echo "No CloudFront distribution found for socialpilot.zynous.com, skipping invalidation"
           fi
