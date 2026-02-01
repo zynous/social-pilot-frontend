@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { setStoredApiBaseUrl } from '@/lib/storage';
 import { getApiBaseUrl } from '@/lib/client';
 
-export default function SignInPage() {
+export default function LoginPage() {
   const router = useRouter();
   const { signIn, signInWithToken } = useAuth();
   const [mode, setMode] = useState<'email' | 'token'>('email');

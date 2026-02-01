@@ -68,10 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (email: string, password: string, apiBaseUrl?: string) => {
       const { getApiBaseUrl } = await import('@/lib/client');
       const baseUrl = apiBaseUrl?.trim() || getApiBaseUrl() || (typeof window !== 'undefined' ? window.location.origin : '');
-      if (apiBaseUrl?.trim()) {
-        const { setStoredApiBaseUrl } = await import('@/lib/storage');
-        setStoredApiBaseUrl(apiBaseUrl.trim());
-      }
+      const { setStoredApiBaseUrl } = await import('@/lib/storage');
+      setStoredApiBaseUrl(baseUrl);
       const client = new (await import('@/lib/api')).ApiClient({
         apiBaseUrl: baseUrl,
         token: '',
