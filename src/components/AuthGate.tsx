@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 
-const PUBLIC_PATHS = ['/sign-in'];
+const PUBLIC_PATHS = ['/login'];
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -21,7 +21,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       return;
     }
     if (!token || !user?.brandId) {
-      router.replace('/sign-in');
+      router.replace('/login');
     }
   }, [checked, loading, token, user?.brandId, isPublic, pathname, router]);
 

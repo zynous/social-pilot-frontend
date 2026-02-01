@@ -48,7 +48,7 @@ The app is built as a static export (`output: 'export'` in `next.config.mjs`). T
 - **Repository variable** (optional but recommended):  
   **Settings** → **Secrets and variables** → **Actions** → **Variables** → New variable:  
   Name: `SOCIAL_PILOT_API_BASE_URL`, Value: your production API base URL (e.g. `https://api.socialpilot.com`).  
-  The workflow passes this into the build step so the client uses this API URL. If unset, the app falls back to the current origin or the URL users enter at sign-in.
+  The workflow passes this into the build step so the client uses this API URL. If unset, the app falls back to the current origin or the URL users enter at login.
 
 ### Same domain for frontend + backend (e.g. socialpilot.zynous.com on ALB today)
 
@@ -60,7 +60,7 @@ If `socialpilot.zynous.com` already points at an ALB (for API and email response
 
 2. **Cache behaviors** (order matters; more specific paths first):
    - **Path pattern** `/api/*` (and any other paths that must hit the backend, e.g. email callback paths): Origin = ALB. Cache policy = CachingDisabled or short TTL so API/email responses are not cached.
-   - **Default behavior** `*`: Origin = S3. Serves the static frontend; requests for `/`, `/sign-in`, `/setup`, etc. go to S3 (and 404s from S3 return `index.html` via error pages).
+   - **Default behavior** `*`: Origin = S3. Serves the static frontend; requests for `/`, `/login`, `/setup`, etc. go to S3 (and 404s from S3 return `index.html` via error pages).
 
 3. **Domain and SSL**: Add alternate domain `socialpilot.zynous.com` and attach the ACM certificate (us-east-1).
 
@@ -72,7 +72,7 @@ Result: `https://socialpilot.zynous.com/` → frontend (S3), `https://socialpilo
 
 ## Structure (extensible)
 
-- `src/app/(auth)/` – sign-in (no shell)
+- `src/app/(auth)/` – login (no shell)
 - `src/app/(app)/` – dashboard, onboarding, settings (with AppShell + AuthGate)
 - `src/components/onboarding/` – wizard steps; add steps in `constants/onboarding.ts` and step components
 - `src/components/settings/` – section editors; add sections in settings page and new section components
