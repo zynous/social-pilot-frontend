@@ -66,9 +66,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="header-desktop-nav">
-          <Link href="/settings" className="btn btn-ghost header-link" style={{ fontSize: 13, color: 'var(--oxford-blue)', minHeight: 44 }}>
-            Settings
-          </Link>
           <span
             className="header-email"
             style={{ fontSize: 13, color: 'var(--oxford-blue)', opacity: 0.9 }}
@@ -76,6 +73,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           >
             {user?.email}
           </span>
+          <Link href="/settings" className="btn btn-ghost header-link" style={{ fontSize: 13, color: 'var(--oxford-blue)', minHeight: 44 }}>
+            Settings
+          </Link>
           <button
             type="button"
             className="btn btn-ghost header-link"
@@ -114,8 +114,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </button>
           <div>
             <div style={{ fontWeight: 700, fontSize: 17, color: 'var(--oxford-blue)', marginBottom: 4 }}>{brand?.name || '—'}</div>
-            <div className="header-drawer-email">{user?.email}</div>
           </div>
+          <div className="header-drawer-email">{user?.email}</div>
           <Link href="/settings" className="header-drawer-link" onClick={closeMenu}>
             Settings
           </Link>
